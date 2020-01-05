@@ -17,6 +17,11 @@ Opera Company Management Software
 **PavarottiGUI** depends on the [Pavarotti project](https://github.com/thoga31/Pavarotti), since it is a GUI interface for the original _Pavarotti_ software.
 
 
+## High DPI fix for Windows
+
+Refer to [this document](WindowsFix.md).
+
+
 
 ## Changelog
 
@@ -34,4 +39,4 @@ Opera Company Management Software
 ## Known issues
 
 * On _Windows 10_, the objects of the window are out of scale and out of place considering the layout implemented using _Scene Builer_.
-  * A fix for this problem is still not known.
+  * A fix for this problem is described in detail [here](WindowsFix.md).
