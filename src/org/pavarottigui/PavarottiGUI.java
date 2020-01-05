@@ -16,6 +16,7 @@
  */
 package org.pavarottigui;
 
+import java.net.URL;
 import org.pavarottigui.pentagon.Pentagon;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -43,7 +44,9 @@ public class PavarottiGUI extends Application {
         stage.setResizable(false);
         
         pentagon.bindStage(stage);
-        pentagon.setLogo("res/logo.png");
+        pentagon.setLogo(PavarottiGUI.class.getResource("resources/logo.png").toExternalForm());
+        pentagon.bindScene(scene);
+        pentagon.setStyle(PavarottiGUI.class.getResource("resources/style.css").toExternalForm());
         
         Pavarotti.launchFromExternal(pentagon, "GUI", VERSION);
     }

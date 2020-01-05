@@ -26,6 +26,7 @@ import java.util.Optional;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Scene;
 
 import javafx.stage.Stage;
 
@@ -55,7 +56,9 @@ public class Pentagon implements Viewer {
     
     private FXMLPavarottiController vControl;
     private Controller vCore;
+    
     private Stage vStage;
+    private Scene vScene;
     
     private String appname;
     private Image applogo;
@@ -81,30 +84,6 @@ public class Pentagon implements Viewer {
     }
     
     /**
-     * Returns the instance of the FXMLPavarottiController
-     * @return the controller object
-     */
-    public FXMLPavarottiController control() {
-        return vControl;
-    }
-    
-    /**
-     * Returns the instance of the org.pavarotti.ui.intf.Controller object
-     * @return the core object
-     */
-    public Controller core() {
-        return vCore;
-    }
-    
-    /**
-     * Returns the instance of the stage object
-     * @return the stage object
-     */
-    public Stage stage() {
-        return vStage;
-    }
-    
-    /**
      * Returns the application name and version
      * @return the string
      */
@@ -119,11 +98,21 @@ public class Pentagon implements Viewer {
     public void setLogo(String path) {
         System.out.print("Setting logo... ");
         try {
-            this.applogo = new Image("file:" + path);
+            this.applogo = new Image( /*"file:" +*/ path);
             vStage.getIcons().add(getLogo());
             System.out.println("[DONE]");
         } catch (Exception e) {
-            System.out.println("[ERROR]");
+            System.out.println("[ERROR: " + e.getMessage() + "]");
+        }
+    }
+    
+    public void setStyle(String path) {
+        System.out.print("Setting stylesheet... ");
+        try {
+            vScene.getStylesheets().add(path);
+            System.out.println("[DONE]");
+        } catch (Exception e) {
+            System.out.println("[ERROR: " + e.getMessage() + "]");
         }
     }
     
@@ -133,6 +122,14 @@ public class Pentagon implements Viewer {
      */
     public void bindStage(Stage stage) {
         this.vStage = stage;
+    }
+    
+    public void bindScene(Scene scene) {
+        this.vScene = scene;
+    }
+    
+    public void closeStage() {
+        this.vStage.close();
     }
     
     /**
@@ -173,6 +170,10 @@ public class Pentagon implements Viewer {
         System.out.println("Binding application controller");
         this.vCore = controller;
         appname = "Pavarotti " + vCore.getVersion().toString();
+    }
+    
+    public void refresh() throws Exception {
+        vCore.refresh();
     }
     
     public void stop() {
@@ -565,6 +566,10 @@ public class Pentagon implements Viewer {
         return getPerfMgrID();
     }
     
+    public boolean performanceIDExists(String ID) {
+        return vCore.performanceIDExists(ID);
+    }
+    
     public String getNameFromPerformance() {
         return String.valueOf(perfMgrObject.getName());
     }
@@ -799,6 +804,10 @@ public class Pentagon implements Viewer {
         return vCore.getTicketPrice(ticketPerfID, ticketPerfSeat);
     }
     
+    public Double ticketBasePrice(String SHOWID) {
+        return vCore.getPerformancePrice(SHOWID);
+    }
+    
     public boolean sellTicket() {
         try {
             return vCore.sellTicket(ticketPerfID, ticketPerfSeat, ticketPerfWhenIndex);
@@ -813,6 +822,10 @@ public class Pentagon implements Viewer {
         } catch (TicketNotSoldException e) {
             return false;
         }
+    }
+    
+    public ArrayList<ArrayList<Boolean>> hallSoldMatrix(final String SHOWID, final short WHENINDEX) {
+        return vCore.hallSoldMatrix(SHOWID, WHENINDEX);
     }
     
     // --- GENERIC -------------------------------------------------------------

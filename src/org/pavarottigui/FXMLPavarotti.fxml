@@ -249,7 +249,7 @@
                               <Font name="System Bold" size="12.0" />
                            </font>
                         </Label>
-                        <ScrollPane layoutX="12.0" layoutY="73.0" prefHeight="416.0" prefWidth="746.0">
+                        <ScrollPane fx:id="scrollpaneTickets" layoutX="12.0" layoutY="73.0" prefHeight="385.0" prefWidth="746.0">
                           <content>
                             <AnchorPane>
                                  <children>
@@ -262,6 +262,16 @@
                               </AnchorPane>
                           </content>
                         </ScrollPane>
+                        <Label layoutX="15.0" layoutY="469.0" text="Base price:">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="labelTicketPrice" layoutX="99.0" layoutY="469.0" text="0.00 EUR">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
                      </children>
               </AnchorPane>
             </content>

@@ -42,11 +42,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 
 import javafx.collections.*;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.paint.Color;
-import javafx.geometry.Insets;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -55,6 +50,7 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.ImageView;
 
@@ -138,6 +134,8 @@ public class FXMLPavarottiController implements Initializable {
     @FXML private Button buttonTicketID2Dates;
     @FXML private ComboBox comboTicketPerfDates;
     @FXML private Button buttonTicketOpenHall;
+    @FXML private Label labelTicketPrice;
+    @FXML ScrollPane scrollpaneTickets;
     private ObservableList<Button> hallButtons;
     
     // Tab: statistics
@@ -161,7 +159,7 @@ public class FXMLPavarottiController implements Initializable {
     private void handleButtonSaveExitAction(ActionEvent event) {
         System.out.println("User has ordered the application to be shutdown.");
         setStatus("Saving and closing...");
-        pentagon.stage().close();
+        pentagon.closeStage();
     }
     
     @FXML
@@ -170,7 +168,7 @@ public class FXMLPavarottiController implements Initializable {
         setStatus("Saving...");
         boolean success = true;
         try {
-            pentagon.core().refresh();
+            pentagon.refresh();
         } catch (Exception e) {
             success = false;
             setStatus("Error while saving! (" + e.getMessage() + ")");
@@ -458,10 +456,10 @@ public class FXMLPavarottiController implements Initializable {
         }
         
         final String ID = txtTicketPerfID.getText();
-        final boolean EXISTS = pentagon.core().performanceIDExists(ID);
+        final boolean EXISTS = pentagon.performanceIDExists(ID);
         if (!EXISTS) {
-            pentagon.showError("The performance with ID \"" + ID + "\" does not exist!");
             comboTicketPerfDates.getItems().clear();
+            labelTicketPrice.setText("0.00 EUR");
             return;
         }
         final int SELECTED = comboTicketPerfDates.getSelectionModel().getSelectedIndex();
@@ -472,7 +470,7 @@ public class FXMLPavarottiController implements Initializable {
     @FXML
     private void handleButtonTicketID2Dates(ActionEvent event) {
         final String ID = txtTicketPerfID.getText();
-        final boolean EXISTS = pentagon.core().performanceIDExists(ID);
+        final boolean EXISTS = pentagon.performanceIDExists(ID);
         if (!EXISTS) {
             pentagon.showError("The performance with ID \"" + ID + "\" does not exist!");
             comboTicketPerfDates.getItems().clear();
@@ -504,7 +502,7 @@ public class FXMLPavarottiController implements Initializable {
         Optional<ButtonType> result;
         
         if (sold) {
-            alert.setContentText("Do you confirm the REFUND of this ticket?");
+            alert.setContentText("Do you confirm the REFUND of this ticket?\nPrice: " + pentagon.ticketPrice() + " EUR");
             result = alert.showAndWait();
             if (result.get() == buttonTypeYes) {
                 if (pentagon.refundTicket()) {
@@ -517,7 +515,7 @@ public class FXMLPavarottiController implements Initializable {
                 pentagon.showInfo("The ticket was NOT refunded.");
             }
         } else {
-            alert.setContentText("Do you confirm the SELL of this ticket?");
+            alert.setContentText("Do you confirm the SELL of this ticket?\nPrice: " + pentagon.ticketPrice() + " EUR");
             result = alert.showAndWait();
             if (result.get() == buttonTypeYes) {
                 if (pentagon.sellTicket()) {
@@ -537,7 +535,7 @@ public class FXMLPavarottiController implements Initializable {
     }
     
     private void showHall(final String SHOWID, final short WHENINDEX) {
-        final ArrayList<ArrayList<Boolean>> MATRIX = pentagon.core().hallSoldMatrix(SHOWID, WHENINDEX);
+        final ArrayList<ArrayList<Boolean>> MATRIX = pentagon.hallSoldMatrix(SHOWID, WHENINDEX);
         final int ROWS = MATRIX.size();
         final int COLS = MATRIX.get(0).size();
         
@@ -545,13 +543,9 @@ public class FXMLPavarottiController implements Initializable {
         for (int i = 0; i < ROWS; i++) {
             for (int j = 0; j < COLS; j++) {
                 Button b = new Button(String.format("%c%02d", (char)((int)'A' + i), j));
-                Background p =
-                        (MATRIX.get(i).get(j)) ?
-                        new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)) :
-                        new Background(new BackgroundFill(Color.LIGHTGREEN, CornerRadii.EMPTY, Insets.EMPTY));
-                b.backgroundProperty().set(p);
                 b.setMinSize(40., 30.);
                 b.setOnMouseClicked(event -> handleButtonHallSeat(event));
+                b.getStyleClass().add( (MATRIX.get(i).get(j)) ? "button-sold" : "button-available");
                 hallButtons.add(b);
                 gridHall.add(b, j, i);
             }
@@ -559,6 +553,8 @@ public class FXMLPavarottiController implements Initializable {
         
         pentagon.setTicketPerfID(SHOWID);
         pentagon.setTicketPerfWhenIndex(WHENINDEX);
+        
+        labelTicketPrice.setText(pentagon.ticketBasePrice(SHOWID).toString() + " EUR");
     }
     
     
@@ -573,6 +569,7 @@ public class FXMLPavarottiController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         System.out.println("Initializing the FXML controller...");
+        System.out.println("\t" + url.getPath());
         
         this.pentagon = PavarottiGUI.pentagon;
         this.pentagon.bindFXML(this);
