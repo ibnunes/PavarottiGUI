@@ -56,6 +56,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.image.ImageView;
 
 import org.pavarottigui.pentagon.Pentagon;
 import org.pavarottigui.types.StaffTableItem;
@@ -75,6 +76,8 @@ public class FXMLPavarottiController implements Initializable {
     @FXML private Button buttonSave;
     @FXML private Button buttonSaveExit;
     @FXML private TabPane tabpaneMain;
+    @FXML private Label labelAppName;
+    @FXML private ImageView imageAppLogo;
     
     // Tab: company information
     @FXML private Tab tabInfoMgr;
@@ -613,6 +616,8 @@ public class FXMLPavarottiController implements Initializable {
     
     public void loadInitialComponents() {
         refreshCompanyInfo();
+        labelAppName.setText(pentagon.getAppName());
+        imageAppLogo.setImage(pentagon.getLogo());
     }
     
 }
